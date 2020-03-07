@@ -1,5 +1,5 @@
 
-all: a
+all: compile run
 
 # framework information for older version of MACOS
 #INCLUDES = -F/System/Library/Frameworks -framework OpenGL -framework GLUT -lm
@@ -13,8 +13,10 @@ SRC_DIR=./src/
 INC_DIR=-Iinclude
 BIN_DIR= ./bin/
 
+FLAGS=gcc -pedantic -Wall -Wno-nullability-completenes
+
 compile:
-	clang $(SRC_DIR)*.c -o $(BIN_DIR)run $(INCLUDES) $(TARGET)
+	$(FLAGS) $(SRC_DIR)*.c -o $(BIN_DIR)run $(INCLUDES) $(TARGET)
 
 run:
 	$(BIN_DIR)run
