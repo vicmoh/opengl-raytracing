@@ -1,0 +1,278 @@
+. CIS*4800 - Assignment 3 - Ray Tracing
+. -------------------------------------
+. Due: Friday, March 6. 
+. 
+. Write a program which performs ray tracing of a scene containing a sphere.
+. 
+. Use OpenGL for the 2D display of the image. The starting code for
+. the assignment includes all of the necessary OpenGL code.
+. The q key exits this program.
+. 
+. 
+. Part I - Read the Scene File 
+. ----------------------------
+. Read a text file that describes the structure of the scene. The file will
+. list the location of the sphere and the light in the scene. For this assignment there
+. will only be one light source and one sphere. The file has the format:
+. 
+. light    x  y  z
+. sphere   x  y  z  R     ar  ag  ab     dr dg db    sr sg sb
+. 
+. 
+. where:
+.   x,y,z are the centre of the sphere or the location of the light,
+.   R is the radius of the sphere
+.   ar, ag, ab are the ambient coefficients for the red, green, and blue colours for the sphere
+.   dr, dg, db are the diffuse coefficients for the red, green, and blue colours for the sphere
+.   sr, sg, sb are the specular coefficients for the red, green, and blue colours for the sphere
+. 
+. The coefficients control how much light of that colour reflects from the surface.
+. 
+. An example of this format is:
+.    light    4.0 5.0 4.0
+.    sphere  0.0 -0.5  -3.0    1.0     0.2 0.2 0.2     0.0 0.5 0.0     0.4 0.4 0.4
+. would create a sphere with:
+.   -at location (0.0 -0.5 -3.0)
+.   -a radius of 1.0
+.   -with a dark gray ambient colour (0.2 0.2 0.2)
+.   -a green diffuse colour (0.0 0.5 0.0)
+.   -and a lighter gray specular highlight (0.4 0.4 0.4)
+. The light would be at (4.0 5.0 4.0).  A sample of this image is on the Courselink site.
+. 
+. 
+. The "light" and "sphere" strings start each line indicate the purpose for the line.
+. There can be any number of blank spaces between each number.
+. 
+. Read the file from the command line (e.g.  a input.txt) and
+. store the light and object information in your program.
+. 
+. 
+. 
+. 
+. Part II - Ray Tracing
+. ----------------------
+. Draw the scene described in the text file using ray tracing to determine
+. the visibility and shading.  Cast one ray per pixel (this ray is calculated
+. in the starting code). Determine if the ray intersects with the sphere
+. objects in the scene using method described in class. Each step of
+. the calculation is described by a comment in the starting source code.
+. Write the code for each step under the comment. Leave the comments
+. in the code. 
+. 
+. 
+. The Math
+. --------
+. 
+. The Viewing Vector
+. =================
+. The origin of the ray is (x0, y0, z0). This is the where the viewpoint will
+. be placed. It is already in the starting code. The viewpoint is (0 0 0).
+. 
+. The direction of the ray is (xd, yd, zd). This is the point in the viewing
+. window that the ray passes through. You need one of these for each pixel.
+. This calculation is already in the starting code. There are two for-loops
+. which move through all of the pixels in the viewing window.
+. 
+. 
+. The Sphere
+. ==========
+. The centre of the sphere is (xc, yc, zc).
+. The radius of the sphere is Sr.
+. 
+. These are read from the input file.
+. 
+. 
+. Solving the Intersection of the Ray and Sphere
+. ==============================================
+. By substituting the ray equation into the sphere equation and using
+. the quadratic equation we can find the intersection point(s).
+. 
+. Calculate A, B, C:
+.   A is equal to 1.0.
+. 
+.   B = 2 * ( xd * (x0 - xc)  + yd * (y0 - yc)  +  zd + (z0 - zc) )
+. 
+.   C = (x0 - xc)^2  + (y0 - yc)^2   + (z0 - zc)^2  - (Sr)^2
+. 
+. where ^2 means everything in the brackets is squared (raised to the power of 2).
+. 
+. 
+. The Discriminant
+. ================
+. Use the discriminant to determine if the ray intersects the sphere at 0, 1, or 2 points.
+. 
+.   dis = B^2 - 4*A*C
+. 
+. If dis < 0 there is no intersection point, the ray misses the sphere.
+. If dis = 0 then the ray intersects the sphere at one point.
+. If dis > 0 then the ray intersects the sphere at two points. 
+. 
+. 
+. The Intersection Point
+. ======================
+. To solve the equation which represents the intersection of the ray and sphere
+. use the quadratic equation:
+. 
+.   t0 = (-B - sqrt(dis) ) / 2A
+.   t1 = (-B + sqrt(dis) ) / 2A
+. 
+. If there is one solution (dis = 0) then calculate only one of the above. If there are two
+. solutions (dis > 0) then calculate both t0 and t1.
+. 
+. 
+. Once t0 and t1 are found the intersection point ri can be calculated.
+. If there is one intersection point (dis = 0) then calculate it using t0:
+. 
+.   ri = (xi yi, zi) = ( (x0 + xd*t0)    (y0 + yd*t0)    (z0 + zd*t0) )
+. 
+. If there are two intersection points then calculate the two points then calculate
+. both of them using t0 and t1.
+. 
+.   ri0 = ( (x0 + xd*t0)    (y0 + yd*t0)    (z0 + zd*t0) )
+.   ri1 = ( (x0 + xd*t1)    (y0 + yd*t1)    (z0 + zd*t1) )
+. 
+. Calculate the distance between the viewpoint (x0, y0, z0) and each point ri0 and ri1.
+. Pick the intersection point which has the smallest distance to the viewpoint.
+. This point will be on the side of the sphere facing the viewer. The point which is farther
+. away will be on the far side of the sphere. Which ever point is closer becomes ri = (xi yi zi)
+. for later calculations.
+. 
+. 
+. Calculate the Normal Vector
+. ===========================
+. The normal vector for the intersection point ri = (xi yi zi) is calculated using
+. the sphere parameters:
+. 
+.    N = (nx ny nz)  =  ( (xi - xc)/Sr    (yi - yc)/Sr    (zi - zc)/Sr  )
+. 
+. This may not be a unit vector so you should normalize it. 
+. 
+. 
+. Calculate the Viewing Vector
+. ============================
+. Use the origin point ro = (x0 y0 z0) and the intersection point ri = (xi yi zi).
+. 
+.   V = ro - ri
+.     = (vx vy vz)
+.     = (x0-xi  y0-yi  z0-zi)
+. 
+. This may not be a unit vector so you should normalize it. 
+. 
+. 
+. Calculating the Light Vector
+. ============================
+. Use the light location point l0 = (lx ly lz) and the intersection point ri = (xi yi zi).
+. 
+.   L = l0 - ri
+.     = (lvx  lvy  lvz)
+.     = (lx-xi  ly-yi  lz-zi)
+. 
+. where lvx, lvy, lvz are the light vector values. This is the different from the
+. position of the light itself which is at the point (lx ly lz).
+. 
+. This may not be a unit vector so you should normalize it. 
+. 
+. 
+. Calculating the dot product of N and L (N.L)
+. ============================================
+. Use the normal vector N and the light vector L calculated above.
+. 
+.   N.L = ( nx*lvx +  ny*lvy +  nz*lvz )
+. 
+. 
+. Calculating the Reflection Vector
+. =================================
+. The reflection vector is calculated using:
+. 
+.   R = 2 * (N.L) * N - L
+.     = (rx ry rz)
+. 
+. This may not be a unit vector so you should normalize it. 
+. 
+. 
+. Calculating the dot product of R and V (R.V)
+. ============================================
+. 
+.   R.V = ( rx*vx +  ry*vy +  rz*vz )
+. 
+. 
+. The Illumination Equation
+. =========================
+. You can plug the dot products (N.L) and (R.V) into the illumination equation along
+. with the values that you read from the input file. 
+. 
+. From the input file:
+.   -the ambient colour for the sphere are:  ar, ag, ab
+.   -the diffuse colour for the sphere are:  dr, dg, db
+.   -the colour of the specular reflection is sr, sg, sb
+.   
+. To make the calculation easier we will assume that the light is as
+. bright as possible and it is white. The light r,g,b values will
+. be (1.0 1.0 1.0).
+. 
+.   I =  ambient + diffuse(N.L)  + specular(R.V)
+. 
+. You need to perform this calculation for each of the red, green, blue colours.
+. 
+.   Ir  =  ar + dr(N.L) + sr(R.V)
+.   Ig  =  ag + dg(N.L) + sg(R.V)
+.   Ib  =  ab + db(N.L) + sb(R.V)
+. 
+. Pass these three colour values to glColorf() for each pixel.
+. 
+. 
+. 
+. More Math
+. ---------
+. 
+. Calculating a Dot Product
+. =========================
+. The dot product of two vectors A = (ax, ay, az) and B = (bx, by, bz) is
+. equal to A.B = (ax*bx + ay*by + az*bz).
+. 
+. 
+. Calculating a Unit Vector
+. =========================
+. Normalizing the vector. Calculate the length of the vector len
+. and divide each element of the vector by that value.
+. For the vector A = (x y z).
+. 
+.    len = sqrt( x^2 + y^2 + z^2)
+. or
+.    len = sqrt( x*x  y*y   z*z)
+. 
+. The unit vector for A equals (x/len  y/len  z/len).
+. 
+. 
+. 
+. 
+. Implementation Notes
+. --------------------
+. If you have difficulty calculating the illumination then a reasonable
+. fall-back is to show that the intersection of the ray and sphere is
+. working correctly. If the sphere is visible but it is not shaded correctly
+. that will be worth some marks.
+. 
+. If the sphere looks distorted and does not look round make sure that it is
+. far enough away from the viewing plane. Don't let the sphere overlap
+. the viewing plane or the viewpoint (x0, y0, z0).
+. 
+. Handin Notes
+. ------------
+. Submit the assignment using the dropbox for assignment 3 in Courselink.
+. 
+. Include a readme.txt which contains your student number, and a short
+. description of any parts of the program which do not function correctly.
+. 
+. Your code must run on the Macs in Thornborough 2420.
+. 
+. Submit your source files necessary to compile your code, a makefile that
+. will compile the code, and any other file necessary to build the project.
+. The assignment will be compiled following these steps by:
+.         -unpacking your submission (tar or zip)
+.         -typing make
+.  	-run a <filename> from the command line
+. Any executables in the directory will be removed before make is run.
+  
+  
+  
