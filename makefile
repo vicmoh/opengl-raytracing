@@ -16,13 +16,15 @@ LIB_DIR=./lib/include/
 
 LIB=./lib/shared/*.so
 INC=-Iinclude  -I./lib/include/
-FLAGS=gcc -Wno-nullability-completeness -Wno-expansion-to-defined
+FLAGS=gcc -Wno-nullability-completeness
+
+FILE='sample.txt'
 
 compile:
 	$(FLAGS) $(SRC_DIR)*.c $(INC) -o $(BIN_DIR)run $(INCLUDES) $(LIB) $(TARGET) 
 
 run:
-	$(BIN_DIR)run
+	$(BIN_DIR)run $(FILE)
 
 m=[AUTO]
 git:

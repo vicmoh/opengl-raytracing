@@ -18,9 +18,65 @@
 #include <GLUT/glut.h>
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
+#include "dynamic_string.h"
+#include "file_reader.h"
+#include "splitter.h"
 
 // window size
 #define SIZE 512
+
+typedef struct {
+  double x, y, z;
+} Light;
+
+typedef struct {
+  double x, y, z;
+  double ar, ag, ab;
+  double dr, dg, db;
+  double sr, sg, sb;
+  double r;
+} Sphere;
+
+Light lightData;
+Sphere sphereData;
+
+bool parseFile(String filePath) {
+  FileReader *fr = new_FileReader(filePath);
+  String lightString = FileReader_getLineAt(fr, 0);
+  String sphereString = FileReader_getLineAt(fr, 1);
+  Splitter *lightSplits = new_Splitter(lightString, ' \t\n');
+  Splitter *sphereSplits = new_Splitter(sphereString, ' \t\n');
+  if (fr == null) return false;
+
+  // init light data
+  lightData.x = atof(lightSplits->list[1]);
+  lightData.y = atof(lightSplits->list[2]);
+  lightData.z = atof(lightSplits->list[3]);
+  // init sphere split
+  sphereData.x = atof(sphereSplits->list[1]);
+  sphereData.y = atof(sphereSplits->list[2]);
+  sphereData.z = atof(sphereSplits->list[3]);
+  sphereData.r = atof(sphereSplits->list[4]);
+  // init the a for sphere.
+  sphereData.ar = atof(sphereSplits->list[6]);
+  sphereData.ag = atof(sphereSplits->list[7]);
+  sphereData.ab = atof(sphereSplits->list[8]);
+  // init the d for sphere.
+  sphereData.dr = atof(sphereSplits->list[9]);
+  sphereData.dg = atof(sphereSplits->list[10]);
+  sphereData.db = atof(sphereSplits->list[11]);
+  // init the s for sphere
+  sphereData.sr = atof(sphereSplits->list[12]);
+  sphereData.sg = atof(sphereSplits->list[13]);
+  sphereData.sb = atof(sphereSplits->list[14]);
+
+  // free objects
+  dispose(lightString, sphereString);
+  free_Splitter(lightSplits);
+  free_Splitter(sphereSplits);
+  free_FileReader(fr);
+  return true;
+}
 
 /* calculate the length of a vector */
 float length(float *x, float *y, float *z) {
@@ -144,7 +200,23 @@ void keyboard(unsigned char key, int x, int y) {
 }
 
 int main(int argc, char **argv) {
+  print("Running script...");
+  // Check if argument exist.
+  if (argc == 0 || argv[1] == null) {
+    print(
+        "NO ARGUMENT FOUND! PLEASE SPECIFY ARGUMENT. Please read the README "
+        "provided for more information.\n");
+    print("\nScript complete.\n");
+    return 0;
+  }
+
   /* read input file */
+  bool parseRes = parseFile(argv[1]);
+  if (parseRes) {
+    print(
+        'Could not parse the file. Please make sure it is in the correct format.');
+    print("\nScript complete.\n");
+  }
 
   /* Initialize OpenGL and GLUT */
   glutInit(&argc, argv);
