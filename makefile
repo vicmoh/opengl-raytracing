@@ -13,7 +13,7 @@ SRC_DIR=./src/
 INC_DIR=-Iinclude
 BIN_DIR= ./bin/
 
-FLAGS=gcc -Wno-nullability-completeness
+FLAGS=gcc -Wno-nullability-completeness -Wno-expansion-to-defined
 
 compile:
 	$(FLAGS) $(SRC_DIR)*.c -o $(BIN_DIR)run $(INCLUDES) $(TARGET)
