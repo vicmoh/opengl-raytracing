@@ -48,7 +48,6 @@ void display() {
 
   glClearColor(0.0, 0.0, 0.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT);
-
   glPointSize(1.0);
 
   /* ray tracing code starts here */
@@ -82,6 +81,10 @@ void display() {
       /* your code starts here */
 
       /* calculate B, C.  A == 1.0 */
+      // double A = 1.0;
+      // double B = 2 * (xd * (x0 - xc) + yd * (y0 - yc) + zd + (z0 - zc));
+      // double C =
+      //     pow((x0 - xc), 2) + pow((y0 - yc), 2) + pow((z0 - zc), 2) - (Sr);
 
       /* calculate the discriminant */
 

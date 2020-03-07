@@ -1,0 +1,2 @@
+light    x  y  z
+sphere   x  y  z  R     ar  ag  ab     dr dg db    sr sg s

@@ -10,13 +10,16 @@ INCLUDES = -F/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platfor
 TARGET = -mmacosx-version-min=10.8
 
 SRC_DIR=./src/
-INC_DIR=-Iinclude
-BIN_DIR= ./bin/
+INC_DIR=./include/
+BIN_DIR=./bin/
+LIB_DIR=./lib/include/
 
+LIB=./lib/shared/*.so
+INC=-Iinclude  -I./lib/include/
 FLAGS=gcc -Wno-nullability-completeness -Wno-expansion-to-defined
 
 compile:
-	$(FLAGS) $(SRC_DIR)*.c -o $(BIN_DIR)run $(INCLUDES) $(TARGET)
+	$(FLAGS) $(SRC_DIR)*.c $(INC) -o $(BIN_DIR)run $(INCLUDES) $(LIB) $(TARGET) 
 
 run:
 	$(BIN_DIR)run
