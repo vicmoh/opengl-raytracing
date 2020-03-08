@@ -127,6 +127,10 @@ Point calcReflectVector(float nl, Point n, Point l) {
   return r;
 }
 
+String pointToString(Point p){
+   return $("x:", _(p.x), ", y:", _(p.y), ", z: ", _(p.z));
+}
+
 /* OoenGL calls this to draw the screen */
 void display() {
   int i, j;
@@ -224,28 +228,37 @@ void display() {
         n.y = (ri.y - sphereData.y) / sphereData.r;
         n.z = (ri.z - sphereData.z) / sphereData.r;
         normalize(&(n.x), &(n.y), &(n.z));
+	printf("nx: %f, ny: %f, nz: %f\n", n.x, n.y, n.z);
 
         /* calculate viewing vector (vx, vy, vz) */
         /*.   V = ro - ri
                 = (vx vy vz)
                 = (x0-xi  y0-yi  z0-zi) */
         Point v = calcViewingAngle(ri0, ri1);
+ 	print("clacViewAngle -> ", pointToString(v));
 
         /* calculate the light vector (lx, ly, lz)  */
         Point r0 = {.x = x0, .y = y0, .z = z0};
         normalize(&(r0.x), &(r0.y), &(r0.z));
-        Point lv = calcLightVector(n, r0);
+
+	Point light = {.x=lightData.x, .y=lightData.y, .z=lightData.z};
+
+        Point lv = calcLightVector(light, ri);
+	print("calcLigthVector -> ", pointToString(lv));
 
         /* calculate the dot product N.L, using the normal vector
            and the light vector */
         float nl = calcDotProduct(n, lv);
+	print("calcDotProduct -> ", _(nl));
 
         /* calculate the reflection vector (rx, ry, rz) */
         Point r = calcReflectVector(nl, n, lv);
+	print("caclReflectionVector -> ", pointToString(r));
 
         /* calculate the dot product R.V, using the reflection
            vector and the viewing vector */
         float rv = calcDotProduct(r, v);
+	print("caclDotProduct -> ", _(rv));
 
         /* calculate illumination using the parameters read from
            the file and N.L and R.V  */
@@ -262,8 +275,8 @@ void display() {
         /* replace the following three lines with the
            illumination calculations */
 
-        glColor3f(ir, ig, ib);
         printf("red: %f, green: %f, blue: %f\n", ir, ig, ib);
+        glColor3f(ir, ig, ib);
         // print("red: ", _(ir), ", green: ", _(ig), ", blue: ", _(ib));
         /* draw the point on the display window at point (x, y) */
         glVertex2f(x, y);
