@@ -23,6 +23,9 @@
 #include "splitter.h"
 #include "array_map.h"
 
+// Show print if debug is true.
+#define DEBUG false
+
 // window size
 #define SIZE 512
 
@@ -46,7 +49,8 @@ Light lightData;
 Sphere sphereData;
 
 bool parseFile(String filePath) {
-  print("Parsing files");
+  if (DEBUG)
+    print("Parsing files");
   FileReader *fr = new_FileReader(filePath);
   String lightString = FileReader_getLineAt(fr, 0);
   String sphereString = FileReader_getLineAt(fr, 1);
@@ -62,6 +66,7 @@ bool parseFile(String filePath) {
          &sphereData.dg, &sphereData.db, &sphereData.sr, &sphereData.sg,
          &sphereData.sb);
   // Print
+  print("Parsing...");
   printf("%s %f %f %f %f %f %f %f %f %f %f %f %f %f\n", buffer, sphereData.x,
          sphereData.y, sphereData.z, sphereData.r, sphereData.ar, sphereData.ag,
          sphereData.ab, sphereData.dr, sphereData.dg, sphereData.db,
@@ -191,7 +196,8 @@ void display() {
       if (dis == 0 || dis > 0) {
         float t0 = (((-1.0) * B) - sqrtf(dis)) / (2 * A);
         float t1 = (((-1.0) * B) + sqrtf(dis)) / (2 * A);
-        printf("t0: %f, t1: %f\n", t0, t1);
+	if (DEBUG)
+          printf("t0: %f, t1: %f\n", t0, t1);
 
         /* if there is one intersection point (discriminant == 0)
            then calculate intersection of ray and sphere at (xi, yi, zi) */
@@ -201,7 +207,8 @@ void display() {
         ri.x = (x0 + xd * t0);
         ri.y = (y0 + yd * t0);
         ri.z = (z0 + zd * t0);
-        printf("x: %f, y: %f, z: %f\n", ri.x, ri.y, ri.z);
+	if (DEBUG)
+          printf("x: %f, y: %f, z: %f\n", ri.x, ri.y, ri.z);
         // }
 
         /* if there are two two intersection points (discriminant > 0)
@@ -228,14 +235,16 @@ void display() {
         n.y = (ri.y - sphereData.y) / sphereData.r;
         n.z = (ri.z - sphereData.z) / sphereData.r;
         normalize(&(n.x), &(n.y), &(n.z));
-	printf("nx: %f, ny: %f, nz: %f\n", n.x, n.y, n.z);
+	if (DEBUG)
+	  printf("nx: %f, ny: %f, nz: %f\n", n.x, n.y, n.z);
 
         /* calculate viewing vector (vx, vy, vz) */
         /*.   V = ro - ri
                 = (vx vy vz)
                 = (x0-xi  y0-yi  z0-zi) */
         Point v = calcViewingAngle(ri0, ri1);
- 	print("clacViewAngle -> ", pointToString(v));
+	if (DEBUG)
+ 	  print("clacViewAngle -> ", pointToString(v));
 
         /* calculate the light vector (lx, ly, lz)  */
         Point r0 = {.x = x0, .y = y0, .z = z0};
@@ -244,21 +253,25 @@ void display() {
 	Point light = {.x=lightData.x, .y=lightData.y, .z=lightData.z};
 
         Point lv = calcLightVector(light, ri);
-	print("calcLigthVector -> ", pointToString(lv));
+	if (DEBUG)
+	  print("calcLigthVector -> ", pointToString(lv));
 
         /* calculate the dot product N.L, using the normal vector
            and the light vector */
         float nl = calcDotProduct(n, lv);
-	print("calcDotProduct -> ", _(nl));
+ 	if (DEBUG)
+	  print("calcDotProduct -> ", _(nl));
 
         /* calculate the reflection vector (rx, ry, rz) */
         Point r = calcReflectVector(nl, n, lv);
-	print("caclReflectionVector -> ", pointToString(r));
+ 	if (DEBUG)
+	  print("caclReflectionVector -> ", pointToString(r));
 
         /* calculate the dot product R.V, using the reflection
            vector and the viewing vector */
         float rv = calcDotProduct(r, v);
-	print("caclDotProduct -> ", _(rv));
+	if(DEBUG)
+	  print("caclDotProduct -> ", _(rv));
 
         /* calculate illumination using the parameters read from
            the file and N.L and R.V  */
@@ -274,8 +287,9 @@ void display() {
 
         /* replace the following three lines with the
            illumination calculations */
-
-        printf("red: %f, green: %f, blue: %f\n", ir, ig, ib);
+	
+	if (DEBUG)
+          printf("red: %f, green: %f, blue: %f\n", ir, ig, ib);
         glColor3f(ir, ig, ib);
         // print("red: ", _(ir), ", green: ", _(ig), ", blue: ", _(ib));
         /* draw the point on the display window at point (x, y) */
