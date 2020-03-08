@@ -121,6 +121,7 @@ void display() {
         // float dist1 =
         float dist0 = calcDistForIntersection(ri, ri0);
         float dist1 = calcDistForIntersection(ri, ri1);
+        ri = (dist1 < dist0) ? ri1 : ri0;
         if (DEBUG) print("t0: ", _(t0), ", t1: ", _(t1));
       }
       if (DEBUG) print("ri -> ", ri.toString);
