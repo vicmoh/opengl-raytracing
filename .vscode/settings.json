@@ -4,6 +4,8 @@
         "vertexf"
     ],
     "files.associations": {
-        "dynamic_string.h": "c"
+        "dynamic_string.h": "c",
+        "parsed_file.h": "c",
+        "point.h": "c"
     }
 }
