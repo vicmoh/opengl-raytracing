@@ -18,7 +18,7 @@ LIB=./lib/shared/*.so
 INC=-Iinclude  -I./lib/include/ -Wno-nullability-completeness
 FLAGS=gcc -Wno-nullability-completeness
 
-FILE='sample.txt'
+FILE='./assets/sample.txt'
 
 compile:
 	$(FLAGS) $(SRC_DIR)*.c $(INC) -o $(BIN_DIR)run $(INCLUDES) $(LIB) $(TARGET) 
