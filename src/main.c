@@ -223,6 +223,7 @@ int main(int argc, char **argv) {
         "\nCould not parse the file. Please make sure it is in the correct"
         "format. File path might be incorrect or does not exist.");
     print("\nScript complete.\n");
+    free_ParsedFile(_pf);
     return 0;
   }
 
@@ -234,5 +235,6 @@ int main(int argc, char **argv) {
   glutDisplayFunc(display);
   glutKeyboardFunc(keyboard);
   glutMainLoop();
+  free_ParsedFile(_pf);
   return 0;
 }
