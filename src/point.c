@@ -25,6 +25,10 @@ Point normalizePoint(Point this) {
 /*                            Calculation functions                           */
 /* -------------------------------------------------------------------------- */
 
+float calcDistForIntersection(Point a, Point b) {
+  return sqrtf(powf(a.x - b.x, 2) + powf(a.y - b.y, 2) + powf(a.z - a.z, 2));
+}
+
 Point calcDistVector(Point a, Point b) {
   return normalizePoint(new_PointOf(a.x - b.x, a.y - b.y, a.z - b.z));
 }

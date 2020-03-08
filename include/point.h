@@ -58,6 +58,14 @@ Point normalizePoint(Point self);
 /*                            Calculation functions                           */
 /* -------------------------------------------------------------------------- */
 
+/** 
+ * Calculate the two intersection.
+ * @param a first point.
+ * @param b second point.
+ * @return intersection value.
+ */
+float calcDistForIntersection(Point a, Point b);
+
 /**
  * Calculate the distance of two points.
  * @param a first point.

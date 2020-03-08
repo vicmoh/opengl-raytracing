@@ -2,8 +2,6 @@
 #include "file_reader.h"
 #include "parsed_file.h"
 
-#define DEBUG true
-
 ParsedFile* new_ParsedFile(String filePath) {
   // Initialize parsing.
   if (DEBUG) print("Parsing files");
@@ -28,16 +26,14 @@ ParsedFile* new_ParsedFile(String filePath) {
          &new->sphereData.sb);
 
   // Print and show what has been parsed.
-  if (DEBUG)
-    printf("Parsed light: %f %f %f\n", new->lightData.x, new->lightData.y,
-           new->lightData.z);
-  if (DEBUG)
-    printf("Parsed sphere: %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
-           new->sphereData.x, new->sphereData.y, new->sphereData.z,
-           new->sphereData.r, new->sphereData.ar, new->sphereData.ag,
-           new->sphereData.ab, new->sphereData.dr, new->sphereData.dg,
-           new->sphereData.db, new->sphereData.sr, new->sphereData.sg,
-           new->sphereData.sb);
+  printf("Parsed light: %f %f %f\n", new->lightData.x, new->lightData.y,
+         new->lightData.z);
+  printf("Parsed sphere: %f %f %f %f %f %f %f %f %f %f %f %f %f\n",
+         new->sphereData.x, new->sphereData.y, new->sphereData.z,
+         new->sphereData.r, new->sphereData.ar, new->sphereData.ag,
+         new->sphereData.ab, new->sphereData.dr, new->sphereData.dg,
+         new->sphereData.db, new->sphereData.sr, new->sphereData.sg,
+         new->sphereData.sb);
 
   // Dispose and return
   dispose(lightString, sphereString);
