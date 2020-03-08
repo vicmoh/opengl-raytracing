@@ -25,7 +25,7 @@
 #include "splitter.h"
 
 // Show print if debug is true.
-#define DEBUG true
+#define DEBUG false
 
 // Window size.
 #define SIZE 512
