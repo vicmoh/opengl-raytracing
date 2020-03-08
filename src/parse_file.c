@@ -4,7 +4,6 @@
 
 ParsedFile* new_ParsedFile(String filePath) {
   // Initialize parsing.
-  if (DEBUG) print("Parsing files");
   FileReader* fr = new_FileReader(filePath);
   String lightString = FileReader_getLineAt(fr, 0);
   String sphereString = FileReader_getLineAt(fr, 1);

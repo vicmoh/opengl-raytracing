@@ -114,8 +114,8 @@ void display() {
       } else if (dis == 0) {
         ri = new_PointOf((x0 + xd * t0), (y0 + yd * t0), (z0 + zd * t0));
       } else if (dis > 0) {
-        float t0 = (((-1.0) * B) - sqrtf(dis)) / (2 * A);
-        float t1 = (((-1.0) * B) + sqrtf(dis)) / (2 * A);
+        t0 = (((-1.0) * B) - sqrtf(dis)) / (2 * A);
+        t1 = (((-1.0) * B) + sqrtf(dis)) / (2 * A);
         ri0 = new_PointOf((x0 + xd * t0), (y0 + yd * t0), (z0 + zd * t0));
         ri1 = new_PointOf((x0 + xd * t1), (y0 + yd * t1), (z0 + zd * t1));
         // float dist1 =
