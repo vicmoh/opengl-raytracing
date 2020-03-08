@@ -37,6 +37,10 @@ typedef struct {
   double r;
 } Sphere;
 
+typedef struct {
+  double x, y, z;
+} Point;
+
 Light lightData;
 Sphere sphereData;
 
@@ -44,8 +48,8 @@ bool parseFile(String filePath) {
   FileReader *fr = new_FileReader(filePath);
   String lightString = FileReader_getLineAt(fr, 0);
   String sphereString = FileReader_getLineAt(fr, 1);
-  Splitter *lightSplits = new_Splitter(lightString, ' \t\n');
-  Splitter *sphereSplits = new_Splitter(sphereString, ' \t\n');
+  Splitter *lightSplits = new_Splitter(lightString, " \t\n");
+  Splitter *sphereSplits = new_Splitter(sphereString, " \t\n");
   if (fr == null) return false;
 
   // init light data
@@ -137,21 +141,54 @@ void display() {
       /* your code starts here */
 
       /* calculate B, C.  A == 1.0 */
-      // double A = 1.0;
-      // double B = 2 * (xd * (x0 - xc) + yd * (y0 - yc) + zd + (z0 - zc));
-      // double C =
-      //     pow((x0 - xc), 2) + pow((y0 - yc), 2) + pow((z0 - zc), 2) - (Sr);
+      double A = 1.0;
+      double B = 2 * (xd * (x0 - sphereData.x) + yd * (y0 - sphereData.y) + zd +
+                      (z0 - sphereData.z));
+      double C = pow((x0 - sphereData.x), 2) + pow((y0 - sphereData.y), 2) +
+                 pow((z0 - sphereData.z), 2) - (sphereData.r);
 
       /* calculate the discriminant */
+      double dis = pow(B, 2) - 4 * A * C;
+
+      double t0 = 0;
+      double t1 = 0;
+      Point ri;
+      Point ri0;
+      Point ri1;
+      Point n;
 
       /* if there is one intersection point (discriminant == 0)
          then calculate intersection of ray and sphere at (xi, yi, zi) */
 
+      if (dis == 0) {
+        // double ri = (xi yi, zi) = ((x0 + xd * t0)(y0 + yd * t0)(z0 + zd *
+        // t0));
+        ri.x = (x0 + xd * t0);
+        ri.y = (y0 + yd * t0);
+        ri.z = (z0 + zd * t0);
+      }
+
       /* if there are two two intersection points (discriminant > 0)
          then determine which point is closer to the viewpoint (x0, y0, z0)
          and calculate the intersection of point (xi, yi, zi) */
+      if (dis > 0) {
+        // ri0 = ( (x0 + xd*t0)    (y0 + yd*t0)    (z0 + zd*t0) )
+        // ri1 = ( (x0 + xd*t1)    (y0 + yd*t1)    (z0 + zd*t1) )
+        // First intersection
+        ri0.x = (x0 + xd * t0);
+        ri0.y = (y0 + yd * t0);
+        ri0.z = (z0 + zd * t0);
+        //  Second intersection
+        ri1.x = (x0 + xd * t1);
+        ri1.y = (y0 + yd * t1);
+        ri1.z = (z0 + zd * t1);
+      }
 
       /* calculate normal vector (nx, ny, nz) to the intersection point */
+      //    N = (nx ny nz)  =  ( (xi - xc)/Sr    (yi - yc)/Sr    (zi - zc)/Sr  )
+      n.x = (ri.x - sphereData.x) / sphereData.r;
+      n.y = (ri.y - sphereData.y) / sphereData.r;
+      n.z = (ri.z - sphereData.z) / sphereData.r;
 
       /* calculate viewing vector (vx, vy, vz) */
 
@@ -202,7 +239,8 @@ void keyboard(unsigned char key, int x, int y) {
 int main(int argc, char **argv) {
   print("Running script...");
   // Check if argument exist.
-  if (argc == 0 || argv[1] == null) {
+
+  if (argc == 0 || argv[1] == null || strcmp(argv[1], "") == 0) {
     print(
         "NO ARGUMENT FOUND! PLEASE SPECIFY ARGUMENT. Please read the README "
         "provided for more information.\n");
@@ -214,7 +252,8 @@ int main(int argc, char **argv) {
   bool parseRes = parseFile(argv[1]);
   if (parseRes) {
     print(
-        'Could not parse the file. Please make sure it is in the correct format.');
+        "Could not parse the file. Please make sure it is in the correct "
+        "format.");
     print("\nScript complete.\n");
   }
 

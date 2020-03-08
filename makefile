@@ -15,7 +15,7 @@ BIN_DIR=./bin/
 LIB_DIR=./lib/include/
 
 LIB=./lib/shared/*.so
-INC=-Iinclude  -I./lib/include/
+INC=-Iinclude  -I./lib/include/ -Wno-nullability-completeness
 FLAGS=gcc -Wno-nullability-completeness
 
 FILE='sample.txt'
