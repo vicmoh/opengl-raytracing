@@ -30,7 +30,9 @@
 // Window size.
 #define SIZE 512
 
+// The parsed file at the start.
 ParsedFile *_pf;
+
 /**
  * Calculate the length vector.
  */
