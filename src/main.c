@@ -25,7 +25,7 @@
 #include "splitter.h"
 
 // Show print if debug is true.
-#define DEBUG false
+#define DEBUG true
 
 // Window size.
 #define SIZE 512
@@ -89,6 +89,7 @@ void display() {
       normalize(&xd, &yd, &zd);
 
       // Calculate -----------------------------------------------------------
+      Point origin = new_PointOf(x0, y0, z0);
 
       // Calculate B, C.  A == 1.0
       float A = 1.0;
@@ -134,7 +135,7 @@ void display() {
       if (DEBUG) print("n -> ", n.toString);
 
       // Calculate viewing vector.
-      Point v = calcDistVector(ri0, ri);
+      Point v = calcDistVector(origin, ri);
       if (DEBUG) print("v -> ", v.toString);
 
       // calculate the light vector (lx, ly, lz).
