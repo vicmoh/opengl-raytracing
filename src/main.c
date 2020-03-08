@@ -97,6 +97,44 @@ void normalize(float *xd, float *yd, float *zd) {
   *zd = *zd / len;
 }
 
+Point calcViewingAngle(Point r0, Point ri) {
+  /*.   V = ro - ri
+          = (vx vy vz)
+          = (x0-xi  y0-yi  z0-zi) */
+  Point v;
+  v.x = r0.x - ri.x;
+  v.y = r0.y - ri.x;
+  v.z = r0.z - ri.z;
+  normalize(&v.x, &v.y, &v.z);
+  return v;
+}
+
+Point calcLightVector(Point l0, Point ri) {
+  // L = l0 - ri
+  //   = (lvx  lvy  lvz)
+  //   = (lx-xi  ly-yi  lz-zi)
+  Point l;
+  l.x = l0.x - ri.x;
+  l.y = l0.y - ri.y;
+  l.z = l0.z - ri.z;
+  return l;
+}
+
+double calcDotProduct(Point n, Point l) {
+  // N.L = ( nx*lvx +  ny*lvy +  nz*lvz)
+  return (n.x * l.x + n.y * l.y + n.z * l.z);
+}
+
+Point calcReflectVector(double nl, Point n, Point l) {
+  // R = 2 * (N.L) * N - L
+  //  = (rx ry rz)
+  Point r;
+  r.x = 2 * (nl)*n.x - l.x;
+  r.y = 2 * (nl)*n.y - l.y;
+  r.z = 2 * (nl)*n.z - l.z;
+  return r;
+}
+
 /* OoenGL calls this to draw the screen */
 void display() {
   int i, j;
@@ -155,11 +193,9 @@ void display() {
       Point ri;
       Point ri0;
       Point ri1;
-      Point n;
 
       /* if there is one intersection point (discriminant == 0)
          then calculate intersection of ray and sphere at (xi, yi, zi) */
-
       if (dis == 0) {
         // double ri = (xi yi, zi) = ((x0 + xd * t0)(y0 + yd * t0)(z0 + zd *
         // t0));
@@ -186,32 +222,41 @@ void display() {
 
       /* calculate normal vector (nx, ny, nz) to the intersection point */
       //    N = (nx ny nz)  =  ( (xi - xc)/Sr    (yi - yc)/Sr    (zi - zc)/Sr  )
+      Point n;
       n.x = (ri.x - sphereData.x) / sphereData.r;
       n.y = (ri.y - sphereData.y) / sphereData.r;
       n.z = (ri.z - sphereData.z) / sphereData.r;
 
       /* calculate viewing vector (vx, vy, vz) */
+      /*.   V = ro - ri
+              = (vx vy vz)
+              = (x0-xi  y0-yi  z0-zi) */
+      Point v = calcViewingAngle(ri0, ri1);
 
       /* calculate the light vector (lx, ly, lz)  */
+      Point r0 = {.x = x0, .y = y0, .z = z0};
+      Point lv = calcLightVector(n, r0);
 
       /* calculate the dot product N.L, using the normal vector
          and the light vector */
+      double nl = calcDotProduct(n, lv);
 
       /* calculate the reflection vector (rx, ry, rz) */
 
-      /* calculate the dot product R.V, using the reflection vector
-         and the viewing vector */
+      /* calculate the dot product R.V, using the reflection
+         vector and the viewing vector */
 
-      /* calculate illumination using the parameters read from the
-         file and N.L and R.V  */
+      /* calculate illumination using the parameters read from
+         the file and N.L and R.V  */
 
       /* set the colour of the point - calculate the r,g,b
-         values using ambient, diffuse, and specular light parameters
-         and the dot products N.L and R.V  */
+         values using ambient, diffuse, and specular light
+         parameters and the dot products N.L and R.V  */
 
       /* end of ray tracing code */
 
-      /* replace the following three lines with the illumination calculations */
+      /* replace the following three lines with the
+         illumination calculations */
       r = (float)rand() / RAND_MAX;
       b = (float)rand() / RAND_MAX;
       g = (float)rand() / RAND_MAX;
