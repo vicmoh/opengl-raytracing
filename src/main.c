@@ -50,45 +50,25 @@ bool parseFile(String filePath) {
   FileReader *fr = new_FileReader(filePath);
   String lightString = FileReader_getLineAt(fr, 0);
   String sphereString = FileReader_getLineAt(fr, 1);
-  print("light string: ", lightString);
-  print("sphere string: ", sphereString);
-  Splitter *lightSplits = new_Splitter(lightString, " \t\n");
-  Splitter *sphereSplits = new_Splitter(sphereString, " \t\n");
   if (fr == null) return false;
 
-  int next = 0;
-  print("light splits length: ", _(lightSplits->length));
-  print("sphere splits length: ", _(sphereSplits->length));
-  for_in(next, lightSplits) print("light data: ", lightSplits->list[next]);
-  for_in(next, sphereSplits) print("sphere data: ", sphereSplits->list[next]);
+  /// Read
+  char buffer[256];
+  sscanf(lightString, "%s %f %f %f", buffer, &lightData.x, &lightData.y,
+         &lightData.z);
+  sscanf(sphereString, "%s %f %f %f %f %f %f %f %f %f %f %f %f %f", buffer,
+         &sphereData.x, &sphereData.y, &sphereData.z, &sphereData.r,
+         &sphereData.ar, &sphereData.ag, &sphereData.ab, &sphereData.dr,
+         &sphereData.dg, &sphereData.db, &sphereData.sr, &sphereData.sg,
+         &sphereData.sb);
+  // Print
+  printf("%s %f %f %f %f %f %f %f %f %f %f %f %f %f\n", buffer, sphereData.x,
+         sphereData.y, sphereData.z, sphereData.r, sphereData.ar, sphereData.ag,
+         sphereData.ab, sphereData.dr, sphereData.dg, sphereData.db,
+         sphereData.sr, sphereData.sg, sphereData.sb);
 
-  // init light data
-  lightData.x = atof(lightSplits->list[1]);
-  lightData.y = atof(lightSplits->list[2]);
-  lightData.z = atof(lightSplits->list[3]);
-  // init sphere split
-  sphereData.x = atof(sphereSplits->list[1]);
-  sphereData.y = atof(sphereSplits->list[2]);
-  sphereData.z = atof(sphereSplits->list[3]);
-  sphereData.r = atof(sphereSplits->list[4]);
-  // init the a for sphere.
-  sphereData.ar = atof(sphereSplits->list[6]);
-  sphereData.ag = atof(sphereSplits->list[7]);
-  sphereData.ab = atof(sphereSplits->list[8]);
-  // init the d for sphere.
-  sphereData.dr = atof(sphereSplits->list[9]);
-  sphereData.dg = atof(sphereSplits->list[10]);
-  sphereData.db = atof(sphereSplits->list[11]);
-  // init the s for sphere
-  sphereData.sr = atof(sphereSplits->list[12]);
-  sphereData.sg = atof(sphereSplits->list[13]);
-  sphereData.sb = atof(sphereSplits->list[14]);
-
-  // free objects
+  // Dispose and return
   dispose(lightString, sphereString);
-  free_Splitter(lightSplits);
-  free_Splitter(sphereSplits);
-  free_FileReader(fr);
   return true;
 }
 
@@ -133,16 +113,16 @@ Point calcLightVector(Point l0, Point ri) {
 
 float calcDotProduct(Point n, Point l) {
   // N.L = ( nx*lvx +  ny*lvy +  nz*lvz)
-  return (n.x * l.x + n.y * l.y + n.z * l.z);
+  return (n.x * l.x) + (n.y * l.y) + (n.z * l.z);
 }
 
 Point calcReflectVector(float nl, Point n, Point l) {
   // R = 2 * (N.L) * N - L
   //  = (rx ry rz)
   Point r;
-  r.x = 2 * (nl)*n.x - l.x;
-  r.y = 2 * (nl)*n.y - l.y;
-  r.z = 2 * (nl)*n.z - l.z;
+  r.x = 2 * nl * n.x - l.x;
+  r.y = 2 * nl * n.y - l.y;
+  r.z = 2 * nl * n.z - l.z;
   normalize(&(r.x), &(r.y), &(r.z));
   return r;
 }
@@ -194,93 +174,100 @@ void display() {
       float A = 1.0;
       float B = 2 * (xd * (x0 - sphereData.x) + yd * (y0 - sphereData.y) +
                      zd * (z0 - sphereData.z));
-      float C = pow((x0 - sphereData.x), 2) + pow((y0 - sphereData.y), 2) +
-                pow((z0 - sphereData.z), 2) - (sphereData.r);
-
+      float C = (x0 - sphereData.x) * (x0 - sphereData.x) +
+                (y0 - sphereData.y) * (y0 - sphereData.y) +
+                (z0 - sphereData.z) * (z0 - sphereData.z) -
+                (sphereData.r) * (sphereData.r);
       /* calculate the discriminant */
-      float dis = pow(B, 2) - 4 * A * C;
-
-      float t0 = ((-1.0) * B - sqrtf(dis)) / (2 * A);
-      float t1 = ((-1.0) * B + sqrtf(dis)) / (2 * A);
+      float dis = (B * B) - (4 * A * C);
       Point ri;
       Point ri0;
       Point ri1;
 
-      /* if there is one intersection point (discriminant == 0)
-         then calculate intersection of ray and sphere at (xi, yi, zi) */
-      if (dis == 0) {
+      if (dis == 0 || dis > 0) {
+        float t0 = (((-1.0) * B) - sqrtf(dis)) / (2 * A);
+        float t1 = (((-1.0) * B) + sqrtf(dis)) / (2 * A);
+        printf("t0: %f, t1: %f\n", t0, t1);
+
+        /* if there is one intersection point (discriminant == 0)
+           then calculate intersection of ray and sphere at (xi, yi, zi) */
+        // if (dis == 0) {
         // float  ri = (xi yi, zi) = ((x0 + xd * t0)(y0 + yd * t0)(z0 + zd *
         // t0));
         ri.x = (x0 + xd * t0);
         ri.y = (y0 + yd * t0);
         ri.z = (z0 + zd * t0);
+        printf("x: %f, y: %f, z: %f\n", ri.x, ri.y, ri.z);
+        // }
+
+        /* if there are two two intersection points (discriminant > 0)
+           then determine which point is closer to the viewpoint (x0, y0, z0)
+           and calculate the intersection of point (xi, yi, zi) */
+        // if (dis > 0) {
+        //   // ri0 = ( (x0 + xd*t0)    (y0 + yd*t0)    (z0 + zd*t0) )
+        //   // ri1 = ( (x0 + xd*t1)    (y0 + yd*t1)    (z0 + zd*t1) )
+        //   // First intersection
+        //   ri0.x = (x0 + xd * t0);
+        //   ri0.y = (y0 + yd * t0);
+        //   ri0.z = (z0 + zd * t0);
+        //   //  Second intersection
+        //   ri1.x = (x0 + xd * t1);
+        //   ri1.y = (y0 + yd * t1);
+        //   ri1.z = (z0 + zd * t1);
+        // }
+
+        /* calculate normal vector (nx, ny, nz) to the intersection point */
+        //    N = (nx ny nz)  =  ( (xi - xc)/Sr    (yi - yc)/Sr    (zi - zc)/Sr
+        //    )
+        Point n;
+        n.x = (ri.x - sphereData.x) / sphereData.r;
+        n.y = (ri.y - sphereData.y) / sphereData.r;
+        n.z = (ri.z - sphereData.z) / sphereData.r;
+        normalize(&(n.x), &(n.y), &(n.z));
+
+        /* calculate viewing vector (vx, vy, vz) */
+        /*.   V = ro - ri
+                = (vx vy vz)
+                = (x0-xi  y0-yi  z0-zi) */
+        Point v = calcViewingAngle(ri0, ri1);
+
+        /* calculate the light vector (lx, ly, lz)  */
+        Point r0 = {.x = x0, .y = y0, .z = z0};
+        normalize(&(r0.x), &(r0.y), &(r0.z));
+        Point lv = calcLightVector(n, r0);
+
+        /* calculate the dot product N.L, using the normal vector
+           and the light vector */
+        float nl = calcDotProduct(n, lv);
+
+        /* calculate the reflection vector (rx, ry, rz) */
+        Point r = calcReflectVector(nl, n, lv);
+
+        /* calculate the dot product R.V, using the reflection
+           vector and the viewing vector */
+        float rv = calcDotProduct(r, v);
+
+        /* calculate illumination using the parameters read from
+           the file and N.L and R.V  */
+        float ir = sphereData.ar + (sphereData.dr * nl) + (sphereData.sr * rv);
+        float ig = sphereData.ag + (sphereData.dg * nl) + (sphereData.sg * rv);
+        float ib = sphereData.ab + (sphereData.db * nl) + (sphereData.sg * rv);
+
+        /* set the colour of the point - calculate the r,g,b
+           values using ambient, diffuse, and specular light
+           parameters and the dot products N.L and R.V  */
+
+        /* end of ray tracing code */
+
+        /* replace the following three lines with the
+           illumination calculations */
+
+        glColor3f(ir, ig, ib);
+        printf("red: %f, green: %f, blue: %f\n", ir, ig, ib);
+        // print("red: ", _(ir), ", green: ", _(ig), ", blue: ", _(ib));
+        /* draw the point on the display window at point (x, y) */
+        glVertex2f(x, y);
       }
-
-      /* if there are two two intersection points (discriminant > 0)
-         then determine which point is closer to the viewpoint (x0, y0, z0)
-         and calculate the intersection of point (xi, yi, zi) */
-      // if (dis > 0) {
-      //   // ri0 = ( (x0 + xd*t0)    (y0 + yd*t0)    (z0 + zd*t0) )
-      //   // ri1 = ( (x0 + xd*t1)    (y0 + yd*t1)    (z0 + zd*t1) )
-      //   // First intersection
-      //   ri0.x = (x0 + xd * t0);
-      //   ri0.y = (y0 + yd * t0);
-      //   ri0.z = (z0 + zd * t0);
-      //   //  Second intersection
-      //   ri1.x = (x0 + xd * t1);
-      //   ri1.y = (y0 + yd * t1);
-      //   ri1.z = (z0 + zd * t1);
-      // }
-
-      /* calculate normal vector (nx, ny, nz) to the intersection point */
-      //    N = (nx ny nz)  =  ( (xi - xc)/Sr    (yi - yc)/Sr    (zi - zc)/Sr  )
-      Point n;
-      n.x = (ri.x - sphereData.x) / sphereData.r;
-      n.y = (ri.y - sphereData.y) / sphereData.r;
-      n.z = (ri.z - sphereData.z) / sphereData.r;
-      normalize(&(n.x), &(n.y), &(n.z));
-
-      /* calculate viewing vector (vx, vy, vz) */
-      /*.   V = ro - ri
-              = (vx vy vz)
-              = (x0-xi  y0-yi  z0-zi) */
-      Point v = calcViewingAngle(ri0, ri1);
-
-      /* calculate the light vector (lx, ly, lz)  */
-      Point r0 = {.x = x0, .y = y0, .z = z0};
-      normalize(&(r0.x), &(r0.y), &(r0.z));
-      Point lv = calcLightVector(n, r0);
-
-      /* calculate the dot product N.L, using the normal vector
-         and the light vector */
-      float nl = calcDotProduct(n, lv);
-
-      /* calculate the reflection vector (rx, ry, rz) */
-      Point r = calcReflectVector(nl, n, lv);
-
-      /* calculate the dot product R.V, using the reflection
-         vector and the viewing vector */
-      float rv = calcDotProduct(r, v);
-
-      /* calculate illumination using the parameters read from
-         the file and N.L and R.V  */
-      float ir = sphereData.ar + sphereData.dr * nl + sphereData.sr * rv;
-      float ig = sphereData.ag + sphereData.dg * nl + sphereData.sg * rv;
-      float ib = sphereData.ab + sphereData.db * nl + sphereData.sg * rv;
-
-      /* set the colour of the point - calculate the r,g,b
-         values using ambient, diffuse, and specular light
-         parameters and the dot products N.L and R.V  */
-
-      /* end of ray tracing code */
-
-      /* replace the following three lines with the
-         illumination calculations */
-
-      glColor3f(ir, ib, ig);
-      // print("red: ", _(ir), ", green: ", _(ig), ", blue: ", _(ib));
-      /* draw the point on the display window at point (x, y) */
-      glVertex2f(x, y);
 
     }  // end loop j
   }    // end loop i

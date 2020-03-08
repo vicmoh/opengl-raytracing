@@ -16,7 +16,7 @@ LIB_DIR=./lib/include/
 
 LIB=./lib/shared/*.so
 INC=-Iinclude  -I./lib/include/ -Wno-nullability-completeness
-FLAGS=gcc -Wno-nullability-completeness
+FLAGS=gcc -Wall -Wno-nullability-completeness
 
 FILE='./assets/sample.txt'
 

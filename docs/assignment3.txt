@@ -90,7 +90,7 @@
 . Calculate A, B, C:
 .   A is equal to 1.0.
 . 
-.   B = 2 * ( xd * (x0 - xc)  + yd * (y0 - yc)  +  zd + (z0 - zc) )
+.   B = 2 * ( xd * (x0 - xc)  + yd * (y0 - yc)  +  zd * (z0 - zc) )
 . 
 .   C = (x0 - xc)^2  + (y0 - yc)^2   + (z0 - zc)^2  - (Sr)^2
 . 
